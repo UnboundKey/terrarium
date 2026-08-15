@@ -1,0 +1,9 @@
+/out
+bin/
+build/
+.idea
+CMakeSettings.json
+Makefile
+
+setting/
+saves/
