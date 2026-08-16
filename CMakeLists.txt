@@ -11,7 +11,13 @@ else()
     add_compile_options(-mavx2 -mfma)
 endif()
 
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build RayLib as static libraries" FORCE)
+
 project(mygame)
+
+add_subdirectory(thirdParty/raylib-6.0)
+add_subdirectory(thirdParty/imgui-master)
+add_subdirectory(thirdParty/rlImGui-Raylib_6_0)
 
 file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
@@ -22,9 +28,12 @@ target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC RESOURCES_PATH="./reso
 target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC PRODUCTION_BUILD=1)
 
 else()
+set(CMAKE_BUILD_TYPE Debug)
 target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC RESOURCES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/resources/")
 target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC PRODUCTION_BUILD=0)
-
 endif()
 
 target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${MY_SOURCES})
+target_include_directories("${CMAKE_PROJECT_NAME}" PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/platform)
+target_include_directories("${CMAKE_PROJECT_NAME}" PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/gameLayer)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE raylib_static imgui rlimgui)
