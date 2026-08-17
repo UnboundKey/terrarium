@@ -14,23 +14,28 @@
 #include "gameMap.h"
 #include "helpers.h"
 #include "imgui.h"
+#include "randomStuff.h"
+#include "worldGen.h"
 
 struct GameData {
     GameMap gameMap;
     Camera2D camera = {};
+
 } gameData;
 
 AssetManager assetManager;
 int selectedBlock;
-
-
+float cameraSpeed;
 bool initGame() {
     assetManager.loadAll();
-    gameData.gameMap.create(500,750);
+    gameData.gameMap.create(1000,500);
 
-    gameData.gameMap.getBlockUnsafe(0,0).type = Block::dirt;
-    gameData.gameMap.getBlockUnsafe(1,1).type = Block::grass;
-    gameData.gameMap.getBlockUnsafe(2,2).type = Block::stone;
+    generateWorld(gameData.gameMap, 0xbeef);
+    //
+    // for (int i = 0; i < gameData.gameMap.mapData.capacity(); i++) {
+    //  gameData.gameMap.mapData[i].type = getRandomInt(rng, 0, Block::BLOCK_COUNT-1);
+    // }
+
 
     gameData.camera.target = {0,0};
     gameData.camera.zoom = 100.0f;
@@ -49,21 +54,15 @@ bool updateGame() {
     gameData.camera.offset = {GetScreenWidth() /2.0f,GetScreenHeight() /2.0f};
 
 #pragma region Camera Controls
-    if (IsKeyDown(KEY_W)) {gameData.camera.target.y -= 5.f * deltaTime;}
-    if (IsKeyDown(KEY_S)) {gameData.camera.target.y += 5.f * deltaTime;}
-    if (IsKeyDown(KEY_A)) {gameData.camera.target.x -= 5.f * deltaTime;}
-    if (IsKeyDown(KEY_D)) {gameData.camera.target.x += 5.f * deltaTime;}
+    if (IsKeyDown(KEY_W)) {gameData.camera.target.y -= cameraSpeed * deltaTime;}
+    if (IsKeyDown(KEY_S)) {gameData.camera.target.y += cameraSpeed * deltaTime;}
+    if (IsKeyDown(KEY_A)) {gameData.camera.target.x -= cameraSpeed * deltaTime;}
+    if (IsKeyDown(KEY_D)) {gameData.camera.target.x += cameraSpeed * deltaTime;}
 #pragma endregion
     ImGui::Begin("Block Selector");
-    ImGui::SliderFloat("Camera Zoom", &gameData.camera.zoom, 0.0f, 100.0f);
+    ImGui::SliderFloat("Camera Zoom", &gameData.camera.zoom, 10.0f, 150.0f);
+    ImGui::SliderFloat("camera_speed", &cameraSpeed, 0.f ,100.f);
     ImGui::SliderInt("Selected Block", &selectedBlock, 0, Block::BLOCK_COUNT -1);
-
-    for (int i = 0; i < Block::BLOCK_COUNT; i++) {
-        if (ImGui::Button(("btn_block" + std::to_string(i)).c_str())) {
-            selectedBlock = i;
-        }
-    }
-
     ImGui::End();
 
     Vector2 worldPos = GetScreenToWorld2D(GetMousePosition(),gameData.camera);

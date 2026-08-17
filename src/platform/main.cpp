@@ -12,7 +12,7 @@ int main() {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(1024, 800, "raylib window");
     SetExitKey(KEY_NULL);
-    // SetTargetFPS(240);
+    SetTargetFPS(240);
 
 #pragma region imgui
     rlImGuiSetup(true);
@@ -32,10 +32,6 @@ int main() {
             CloseWindow();
         };
 #pragma region ImGui
-        ImGui::Begin("Hello, world!");
-        ImGui::Text("This is some text.");
-        ImGui::Button("button");
-        ImGui::End();
         rlImGuiEnd();
 #pragma endregion
         EndDrawing();
